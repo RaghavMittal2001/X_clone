@@ -7,17 +7,17 @@ import { IoStatsChartSharp } from "react-icons/io5";
 const Main_Timeline = () => {
     return (
         <>
-            <main className="ml-[275px] p-2 mx-2 flex w-[600px] h-full min-h-screen flex-col border-l-[0.5px] border-r-[0.5px] border-gray-600">
+            <main className="ml-[275px] p-2 mx-2 flex w-[600px] h-full min-h-screen flex-col border-l-[0.5px] border-r-[0.5px] border-gray-600 bg-background-secondary">
                 <h1 className="text-xl font-bold p-2 backdrop-blur bg-black/10 sticky top-0">
                     Home
                 </h1>
-                <div className=" border-t-[0.5px]  border-b-[0.5px] flex items-stretch py-4 space-x-2 border-gray-600 relative">
+                <div className=" border-t-[0.25px]  border-b-[0.25px] flex items-stretch py-4 space-x-2 border-gray-600 relative">
                     <div className="w-14 h-14 bg-slate-400 rounded-full flex-none "></div>
                     <form className="flex flex-col w-full text-3xl-">
                         <input
                             type="text"
                             title="tweet"
-                            className="w-full h-full bg-transparent outline-none border-none border-b-[0.5px] border-gray-600 p-2 text-2xl"
+                            className="w-full h-full bg-transparent outline-none border-none border-b-[0.25px] border-gray-800 p-2 text-2xl"
                             placeholder="what's happening ?"
                         />
                         <div className="flex justify-between items-center w-full ">

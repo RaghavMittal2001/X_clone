@@ -1,8 +1,11 @@
+import { RootState } from "@/Redux/store";
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { BiHomeCircle, BiUser } from "react-icons/bi";
 import { BsBell, BsBookmark, BsEnvelope, BsThreeDots, BsTwitter } from "react-icons/bs";
 import { HiOutlineHashtag } from "react-icons/hi";
+import { useSelector } from "react-redux";
 const Navihation_items = [
   {
     title: "Twitter",
@@ -33,10 +36,13 @@ const Navihation_items = [
     icon: BiUser,
   },
 ];
+
 const Left_Sidebar = () => {
+  const LoginUser=useSelector((state:RootState)=>state.user)
+  console.log("LoginUser",LoginUser)
   return (
    <>
-  <section className="fixed top-0  w-[275px] h-screen flex flex-col justify-between px-8 py-4">
+  <section className="fixed top-0  w-[255px] h-screen flex flex-col justify-between px-8 py-4">
           <div className="flex flex-col items-stretch space-y-4 mt-4 h-screen">
             {Navihation_items.map((item) => (
               <Link
@@ -59,18 +65,26 @@ const Left_Sidebar = () => {
           </div>
           <button
             type="button"
-            className="absolute bottom-0 left-0 w-full flex items-center justify-between px-4 py-4  rounded-3xl hover:bg-white/20 transition duration-200"
+            className="absolute bottom-0 left-0 w-full flex items-center justify-between mx-4 py-2  rounded-full hover:bg-white/20 transition duration-200"
           >
-            <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 rounded-full bg-gray-300"></div>
-              <div className="flex flex-col items-start">
-                <div className="text-lg font-semibold">User Name</div>
-                <div className="text-sm text-gray-500">@username</div>
+            <div className="flex items-center ml-1 space-x-2">
+              <div className="w-10 h-10 rounded-full  p-1">
+                <Image
+                  src={LoginUser?.avatar_url || "/default-avatar.png"}
+                  alt="User Avatar"
+                  className="w-full h-full rounded-full object-cover"
+                  width={40}
+                  height={40}
+                />
+              </div>
+              <div className="flex flex-col items-start space-x-2">
+                <div className="text-sm font-semibold">{LoginUser?.full_name}</div>
+                <div className="text-sm text-gray-500">@{LoginUser.username}</div>
               </div>
             </div>
 
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-500 hover:bg-gray-700 transition duration-200">
-              <BsThreeDots />
+            <div className="flex items-center justify-center w-15 h-10 rounded-full transition duration-200">
+              <BsThreeDots size={20}/>
             </div>
           </button>
         </section>

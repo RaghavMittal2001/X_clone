@@ -1,0 +1,145 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+
+model User {
+  id    Int    @id @default(autoincrement())
+  username  String
+  email String @unique
+  password String?
+  profileImage String?
+  dateOfBirth DateTime?
+  phoneNumber String? @unique @db.VarChar(15)
+
+  tweets Tweet[]
+  likes Like[]
+  replies Reply[]
+  bookmarks Bookmark[]
+  followers Follow[] @relation("follower")
+  following Follow[] @relation("following")
+  notifications Notification[]
+  sentMessages Message[] @relation("sender")
+  receivedMessages Message[] @relation("receiver")
+}
+
+model Tweet {
+  id         Int       @id @default(autoincrement())
+  content    String
+  userId     Int
+  authorId   User      @relation(fields: [userId], references: [id])
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  likes      Like[]
+  replies    Reply[]
+  hashtags   TweetHashtag[] // Added relation to TweetHashtag
+  bookmarks  Bookmark[]
+  notifications Notification[]
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  tweetId   Int
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tweet     Tweet    @relation(fields: [tweetId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  
+    @@unique([userId, tweetId]) // Prevent duplicate likes
+  @@index([tweetId]) // Index for faster lookups
+  @@index([userId]) // Index for faster lookups
+}
+
+model Reply {
+  id        Int      @id @default(autoincrement())
+  content   String
+  tweetId   Int
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tweet     Tweet    @relation(fields: [tweetId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Hashtag {
+  id        Int      @id @default(autoincrement())
+  name      String
+  tweetTags TweetHashtag[] // Added relation to TweetHashtag
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Bookmark {
+  id        Int      @id @default(autoincrement())
+  tweetId   Int
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tweet     Tweet    @relation(fields: [tweetId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+   @@index([tweetId])
+}
+
+model Follow {
+  id         Int      @id @default(autoincrement())
+  followerId Int
+  followingId Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  follower   User     @relation("follower", fields: [followerId], references: [id])
+  following  User     @relation("following", fields: [followingId], references: [id])
+ @@unique([followerId, followingId])
+
+}
+enum NotificationType {
+  LIKE
+  REPLY
+  FOLLOW
+  MESSAGE
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  tweetId   Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+  tweet     Tweet?    @relation(fields: [tweetId], references: [id])
+  type  NotificationType @default(LIKE)
+ 
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  senderId  Int
+  receiverId Int
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sender    User     @relation("sender", fields: [senderId], references: [id])
+  receiver  User     @relation("receiver", fields: [receiverId], references: [id])
+@@index([senderId, receiverId])
+}
+
+model TweetHashtag {
+  id        Int      @id @default(autoincrement())
+  tweetId   Int
+  hashtagId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tweet     Tweet    @relation(fields: [tweetId], references: [id])
+  hashtag   Hashtag  @relation(fields: [hashtagId], references: [id])
+   @@unique([tweetId, hashtagId]) // Prevent duplicate hashtag associations
+  @@index([tweetId])
+@@index([hashtagId])
+}
+

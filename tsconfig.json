@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "typeRoots": ["./types", "./node_modules/@types"] ,
     "target": "ES2017",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -20,6 +21,7 @@
       }
     ],
     "paths": {
+      "@prisma/client": ["./node_modules/.prisma/client"],
       "@/*": ["./src/*"]
     }
   },
