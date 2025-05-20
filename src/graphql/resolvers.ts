@@ -18,16 +18,27 @@ export const resolvers = {
         where: { email },
       });
     },
-     
+    tweets: async () => {
+      return await prisma.tweet.findMany();
+      // Your logic to fetch tweets
+    },
   },
+  Tweet : {
+    author: async (parent: { userId: number }) => {
+      const { userId } = parent;
+      return await prisma.user.findUnique({
+        where: { id: userId },
+      });
+    },
+  },
+
   Mutation: {
-    createUser: async (_: unknown, args: { username: string; email: string; password: string }) => {
-      const { username, email, password } = args;
+    createUser: async (_: unknown, args: { fullName: string; email: string;  }) => {
+      const { fullName, email} = args;
       return await prisma.user.create({
         data: {
-          username,
+          fullName,
           email,
-          password,
         },
       });
     },
@@ -45,6 +56,16 @@ export const resolvers = {
       const { id } = args;
       return await prisma.user.delete({
         where: { id },
+      });
+    },
+    createTweet: async (_: unknown, args: { content: string, userId: number }) => {
+      
+      // Assuming you have a session object with user information
+      return await prisma.tweet.create({
+        data: {
+          content: args.content,
+          userId: args.userId, // Assuming you have the user ID from the session
+        },
       });
     },
   },

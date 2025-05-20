@@ -42,7 +42,7 @@ const Left_Sidebar = () => {
   console.log("LoginUser",LoginUser)
   return (
    <>
-  <section className="fixed top-0  w-[255px] h-screen flex flex-col justify-between px-8 py-4">
+  <section className="fixed top-0  w-[255px] h-screen flex flex-col justify-between px-8 py-4 ">
           <div className="flex flex-col items-stretch space-y-4 mt-4 h-screen">
             {Navihation_items.map((item) => (
               <Link
