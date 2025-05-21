@@ -29,7 +29,7 @@ declare global {
     }
   }
   interface ReduxState {
-    user:{
+    user: {
       id: number | null;
       username: string | null;
       email: string | null;
@@ -37,17 +37,33 @@ declare global {
       full_name: string | null;
     }
   }
-  interface TweetType{
+  interface LikeType {
+  id: number;
+  user: {
+    id: number;
+  };
+}
+
+  interface TweetType {
     id: number;
     content: string;
     createdAt: string;
     updatedAt: string;
     userId: number;
+    likes:LikeType[];
     author: {
       id: number;
       fullName: string;
       email: string;
       profileImage: string;
     }
+    
+  }
+  interface ReplyDialogProps {
+    isOpen: boolean;
+    selectedTweet: TweetType;
+  }
+  interface CommentButtonProps {
+    selectedTweet: TweetType;
   }
 }

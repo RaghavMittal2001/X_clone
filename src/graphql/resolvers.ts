@@ -1,3 +1,4 @@
+
 import { prisma } from "@/lib/prisma";
 
 export const resolvers = {
@@ -22,19 +23,33 @@ export const resolvers = {
       return await prisma.tweet.findMany();
       // Your logic to fetch tweets
     },
+
   },
-  Tweet : {
+  Tweet: {
     author: async (parent: { userId: number }) => {
       const { userId } = parent;
       return await prisma.user.findUnique({
         where: { id: userId },
       });
     },
+    likes: async (parent: { id: number }) => {
+      const { id } = parent;
+      const likes = await prisma.like.findMany({
+        where: { tweetId: id },
+        include: {
+          user: true,
+        },
+      });
+
+      return likes ?? []; // Ensure non-null return
+    },
+
   },
 
+
   Mutation: {
-    createUser: async (_: unknown, args: { fullName: string; email: string;  }) => {
-      const { fullName, email} = args;
+    createUser: async (_: unknown, args: { fullName: string; email: string; }) => {
+      const { fullName, email } = args;
       return await prisma.user.create({
         data: {
           fullName,
@@ -59,7 +74,7 @@ export const resolvers = {
       });
     },
     createTweet: async (_: unknown, args: { content: string, userId: number }) => {
-      
+
       // Assuming you have a session object with user information
       return await prisma.tweet.create({
         data: {
@@ -68,5 +83,34 @@ export const resolvers = {
         },
       });
     },
+    CreateReply: async (_: unknown, args: { content: string, userId: number, tweetId: number }) => {
+      // Assuming you have a session object with user information
+      return await prisma.reply.create({
+        data: {
+          content: args.content,
+          userId: args.userId, // Assuming you have the user ID from the session
+          tweetId: args.tweetId,
+        },
+      });
+    },
+    createLike: async (_: unknown, args: { tweetId: number, userId: number }) => {
+      const { tweetId, userId } = args;
+      return await prisma.like.create({
+        data: {
+          tweetId,
+          userId,
+        },
+      });
+    },
+    deleteLike: async (_: unknown, args: { tweetId: number, userId: number }) => {
+      const { tweetId, userId } = args;
+      return await prisma.like.deleteMany({
+        where: {
+          tweetId,
+          userId,
+        },
+      });
+    },
+
   },
 };

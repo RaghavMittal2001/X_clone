@@ -36,7 +36,7 @@ type Tweet {
   author: User!    # relation to User
   createdAt: String!
   updatedAt: String!
-  likes: [Like!]!
+  likes: [Like]
   replies: [Reply!]!
   hashtags: [TweetHashtag!]!
   bookmarks: [Bookmark!]!
@@ -137,6 +137,9 @@ type Query {
     updateUser(id: Int!, username: String, email: String, password: String): User!
     deleteUser(id: Int!): Boolean!
     createTweet(content: String!,userId:Int!): Tweet!
+    createLike(tweetId: Int!, userId: Int!): Like!
+    deleteLike(tweetId: Int!, userId: Int!): Boolean!
+    CreateReply(content: String!, tweetId: Int!, userId: Int!): Reply!
   }
   
 `;
