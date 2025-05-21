@@ -104,12 +104,14 @@ export const resolvers = {
     },
     deleteLike: async (_: unknown, args: { tweetId: number, userId: number }) => {
       const { tweetId, userId } = args;
-      return await prisma.like.deleteMany({
+      return (await prisma.like.deleteMany({
         where: {
           tweetId,
           userId,
         },
-      });
+      })).count > 0;
+    // Return true if at least one like was deleted
+    // Return false if no likes were deleted
     },
 
   },

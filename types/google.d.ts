@@ -62,6 +62,7 @@ declare global {
   interface ReplyDialogProps {
     isOpen: boolean;
     selectedTweet: TweetType;
+    onClose: () => void;
   }
   interface CommentButtonProps {
     selectedTweet: TweetType;

@@ -12,7 +12,7 @@ import React, { useState, useEffect } from "react";
 import { BsDot } from "react-icons/bs";
 import { useSelector } from "react-redux";
 
-const ReplyDialog = ({ selectedTweet, isOpen }: ReplyDialogProps) => {
+const ReplyDialog = ({ selectedTweet, isOpen,onClose }: ReplyDialogProps) => {
   const logginuser = useSelector((state: ReduxState) => state.user);
   const [commentboxisOpen, setCommentBoxIsOpen] = useState(isOpen);
   const [createReply] = useMutation(CREATE_REPLY);
@@ -47,7 +47,7 @@ const ReplyDialog = ({ selectedTweet, isOpen }: ReplyDialogProps) => {
   
   return (
     <div className="fixed z-10 top-0  flex items-start justify-center left-2.5 bg-background-auth w-full h-full p-8">
-      <Dialog open={commentboxisOpen} onOpenChange={setCommentBoxIsOpen}>
+      <Dialog open={commentboxisOpen} onOpenChange={onClose}>
         <DialogDescription className=" hidden">
         Type your reply below and click post to submit.
         </DialogDescription>

@@ -50,5 +50,10 @@ const CREATE_LIKE = gql`
     }
   }
 `;
+const DELETE_LIKE = gql`
+  mutation DeleteLike($tweetId: Int!, $userId: Int!) {
+    deleteLike(tweetId: $tweetId, userId: $userId) 
+  }
+`;
 
-export { All_Tweets, CREATE_TWEET, CREATE_REPLY , CREATE_LIKE};
+export { All_Tweets, CREATE_TWEET, CREATE_REPLY , CREATE_LIKE, DELETE_LIKE};

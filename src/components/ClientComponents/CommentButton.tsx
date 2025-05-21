@@ -7,7 +7,7 @@ const CommentButton = ({selectedTweet}:CommentButtonProps) => {
  
   return (
     <>
-      <ReplyDialog isOpen={CommentBoxisOpen} selectedTweet={selectedTweet}/>
+      <ReplyDialog isOpen={CommentBoxisOpen} selectedTweet={selectedTweet} onClose={() => setCommentBoxIsOpen(false)}/>
       <button
         title="Comment"
         type="button"
