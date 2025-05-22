@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect, useState } from "react";
+
+import React, { useEffect, useState, useCallback } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@radix-ui/react-dialog";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
@@ -8,98 +9,104 @@ import { gql, useLazyQuery, useMutation } from "@apollo/client";
 import { useDispatch } from "react-redux";
 import { setId } from "@/Redux/userSlice";
 
+const GET_USER_BY_EMAIL = gql`
+  query GetUserByEmail($email: String!) {
+    userByEmail(email: $email) {
+      id
+      email
+    }
+  }
+`;
+
+const CREATE_USER = gql`
+  mutation CreateUser($fullName: String, $email: String!, $profileImage: String) {
+    createUser(fullName: $fullName, email: $email, profileImage: $profileImage) {
+      id
+      username
+      email
+      profileImage
+    }
+  }
+`;
+
+interface GoogleSignInResponse {
+  credential: string;
+}
+
 const Authpage = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(true);
   const supabase = createClient();
 
-  const GET_USER_BY_EMAIL = gql`
-    query GetUserByEmail($email: String!) {
-      userByEmail(email: $email) {
-        id
-        email
-      }
-    }
-  `;
-
-  const CREATE_USER = gql`
-    mutation CreateUser($fullName: String, $email: String!) {
-      createUser(fullName: $fullName, email: $email) {
-        id
-        username
-        email
-        profileImage
-      }
-    }
-  `;
-
-  const [createUser] = useMutation(CREATE_USER);
   const [getUserByEmail] = useLazyQuery(GET_USER_BY_EMAIL);
+  const [createUser] = useMutation(CREATE_USER);
 
-  const handleSignInWithGoogle = React.useCallback(
-    async (response: GoogleSignInResponse): Promise<void> => {
-      const { data, error } = await supabase.auth.signInWithIdToken({
-        provider: "google",
-        token: response.credential,
-      });
-      if (error) {
-        console.error("Error signing in with Google:", error);
-        return;
-      } else {
-        console.log("Successfully signed in with Google:", data);
-        // Handle successful sign-in, e.g., redirect or update UI
-      }
-      // Wait for Supabase to persist the session before redirecting
-      const checkSessionInterval = setInterval(async () => {
-        const { data: sessionData } = await supabase.auth.getSession();
-        if (sessionData.session) {
-          clearInterval(checkSessionInterval);
-          //check if user already exists
-          const email = sessionData.session.user.email;
-          const { data: existingUserData } = await getUserByEmail({
-            variables: { email },
-          });
-          if (existingUserData && existingUserData.userByEmail) {
-            console.log(
-              "User already exists in the database with ID:",
-              existingUserData.userByEmail.id
-            );
+  const checkSessionAndProceed = useCallback(async () => {
+    let retries = 10;
+    while (retries--) {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const session = sessionData?.session;
+
+      if (session) {
+        const email = session.user.email;
+        try {
+          const { data: existingUserData } = await getUserByEmail({ variables: { email } });
+
+          if (existingUserData?.userByEmail) {
             dispatch(setId(existingUserData.userByEmail.id));
-            // User already exists, redirect to home page
-            console.log(
-              "User already exists, redirecting to home page:",
-              email
-            );
             router.push("/Home");
           } else {
-            // User does not exist, create a new user
-            console.log(
-              "User does not exist, creating new user:",
-              data.user.email
-            );
-            createUser({
+            const { user_metadata } = session.user;
+            const { data: createdUser } = await createUser({
               variables: {
-                fullName: sessionData.session.user.user_metadata.full_name,
-                email: data.user.email,
-                profileImage: sessionData.session.user.user_metadata.avatar_url,
+                fullName: user_metadata.full_name,
+                email: email,
+                profileImage: user_metadata.avatar_url,
               },
             });
 
+            dispatch(setId(createdUser?.createUser?.id));
             router.push("/Home");
           }
+        } catch (err) {
+          console.error("Error during GraphQL operations:", err);
         }
-      }, 300);
+        return;
+      }
+
+      await new Promise((res) => setTimeout(res, 300));
+    }
+
+    console.warn("Supabase session was not established in time.");
+  }, [supabase, getUserByEmail, createUser, dispatch, router]);
+
+  const handleSignInWithGoogle = useCallback(
+    async ({ credential }: GoogleSignInResponse) => {
+      try {
+        const { error } = await supabase.auth.signInWithIdToken({
+          provider: "google",
+          token: credential,
+        });
+
+        if (error) {
+          console.error("Error signing in with Google:", error);
+          return;
+        }
+
+        await checkSessionAndProceed();
+      } catch (err) {
+        console.error("Sign-in error:", err);
+      }
     },
-    []
+    [supabase, checkSessionAndProceed]
   );
 
-  const handleCredentialResponse = React.useCallback(
+  const handleCredentialResponse = useCallback(
     (response: google.accounts.id.CredentialResponse) => {
-      console.log("Google Credential:", response.credential);
-      handleSignInWithGoogle({
-        credential: response.credential,
-      });
+      if (response.credential) {
+        handleSignInWithGoogle({ credential: response.credential });
+      }
     },
     [handleSignInWithGoogle]
   );
@@ -112,7 +119,7 @@ const Authpage = () => {
     document.body.appendChild(script);
 
     script.onload = () => {
-      if (window.google && window.google.accounts.id) {
+      if (window.google?.accounts?.id) {
         window.google.accounts.id.initialize({
           client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
           callback: handleCredentialResponse,
@@ -135,34 +142,27 @@ const Authpage = () => {
         );
       }
     };
-  }, [handleCredentialResponse]);
-  return (
-    <div>
-      <div className="z-50 fixed inset-0 p-14 bg-background-auth flex justify-center items-center">
-        <div className="bg-background-auth">
-          <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent
-              aria-describedby="auth-description"
-              className="bg-black text-white rounded-2xl shadow-3xl  w-full max-w-max p-24   "
-            >
-              <DialogTitle className="sr-only">Sign Up</DialogTitle>
 
-              <div className="flex flex-col gap-6 items-center justify-center">
-                <div className="pr-4 ">
-                  <BsTwitter size={50} />
-                </div>
-                <h2 className="text-3xl font-semibold">
-                  Welcome to Twitter 👋
-                </h2>
-                <p className="text-ml text-gray-400">
-                  Continue with Google to sign in
-                </p>
-                <div id="google-signin-button" className="mt-4 text-2xl"></div>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, [handleCredentialResponse]);
+
+  return (
+    <div className="z-50 fixed inset-0 p-14 bg-background-auth flex justify-center items-center">
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="bg-black text-white rounded-2xl shadow-3xl w-full max-w-max p-24">
+          <DialogTitle className="sr-only">Sign Up</DialogTitle>
+          <div className="flex flex-col gap-6 items-center justify-center">
+            <div className="pr-4">
+              <BsTwitter size={50} />
+            </div>
+            <h2 className="text-3xl font-semibold">Welcome to Twitter 👋</h2>
+            <p className="text-ml text-gray-400">Continue with Google to sign in</p>
+            <div id="google-signin-button" className="mt-4 text-2xl" />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

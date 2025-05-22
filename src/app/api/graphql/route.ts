@@ -1,9 +1,11 @@
 // app/api/graphql/route.ts
+
 import { ApolloServer } from '@apollo/server';
 import { startServerAndCreateNextHandler } from '@as-integrations/next';
-import { PrismaClient } from '@prisma/client';
 import { typeDefs } from '@/graphql/schema';
 import { resolvers } from '@/graphql/resolvers';
+import { PrismaClient } from '@prisma/client';
+import { NextRequest } from 'next/server';
 
 const prisma = new PrismaClient();
 
@@ -12,15 +14,11 @@ const server = new ApolloServer({
   resolvers,
 });
 
-const handler = startServerAndCreateNextHandler(server, {
+// Create handler compatible with Next.js App Router API routes
+const handler = startServerAndCreateNextHandler<NextRequest>(server, {
   context: async () => ({ prisma }),
 });
 
-export { handler as GET, handler as POST };
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-// This file sets up an Apollo Server with Next.js API routes.
-// It uses Prisma as the database client and defines GraphQL schema and resolvers.
+// Export GET and POST handlers
+export const GET = handler;
+export const POST = handler;
