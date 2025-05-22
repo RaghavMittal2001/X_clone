@@ -48,12 +48,13 @@ export const resolvers = {
 
 
   Mutation: {
-    createUser: async (_: unknown, args: { fullName: string; email: string; }) => {
-      const { fullName, email } = args;
+    createUser: async (_: unknown, args: { fullName: string; email: string;   profileImage:string }) => {
+      const { fullName, email,profileImage } = args;
       return await prisma.user.create({
         data: {
           fullName,
           email,
+          profileImage,
         },
       });
     },

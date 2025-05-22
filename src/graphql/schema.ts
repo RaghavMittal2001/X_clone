@@ -133,7 +133,7 @@ type Query {
 }
  
   type Mutation {
-    createUser(fullName: String, email: String!): User!
+    createUser(fullName: String, email: String!,profileImage:String): User!
     updateUser(id: Int!, username: String, email: String, password: String): User!
     deleteUser(id: Int!): Boolean!
     createTweet(content: String!,userId:Int!): Tweet!

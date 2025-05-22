@@ -8,7 +8,7 @@ const PostTweet = () => {
     const [loading, setLoading] = React.useState(false);
   const logginuser = useSelector((state: ReduxState) => state.user);
   const [createTweet] = useMutation(CREATE_TWEET);
-
+  console.log("logginuser", logginuser);
   const handleTweet = async (formdata: FormData): Promise<void> => {
     setLoading(true);
     console.log("formdata", formdata);
@@ -20,6 +20,7 @@ const PostTweet = () => {
       },
     });
     setLoading(false);
+    
     console.log("Tweet created successfully");
   };
   return (

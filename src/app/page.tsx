@@ -29,6 +29,7 @@ const Authpage = () => {
         id
         username
         email
+        profileImage
       }
     }
   `;
@@ -81,6 +82,7 @@ const Authpage = () => {
               variables: {
                 fullName: sessionData.session.user.user_metadata.full_name,
                 email: data.user.email,
+                profileImage: sessionData.session.user.user_metadata.avatar_url,
               },
             });
 
