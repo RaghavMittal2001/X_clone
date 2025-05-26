@@ -1,12 +1,12 @@
-generator client {
+generator client { 
   provider = "prisma-client"
   output   = "../src/generated/prisma"
 }
 
-datasource db {
+datasource db { 
   provider  = "postgresql"
-  url       = env("NEXT_PUBLIC_DATABASE_URL")
-  directUrl = env("NEXT_PUBLIC_DIRECT_URL")
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
