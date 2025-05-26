@@ -2,17 +2,19 @@
   "name": "x_clone",
   "version": "0.1.0",
   "private": true,
-   "scripts": {
+  "scripts": {
     "dev": "next dev",
+    "postinstall": "prisma generate",
     "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "next lint",
-    "postinstall": "prisma generate"
+    "lint": "next lint"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
     "@apollo/server": "^4.12.1",
-    "@prisma/client": "^6.7.0",
+    "@as-integrations/next": "^3.2.0",
+    "@prisma/client": "^6.8.2",
+    "@prisma/extension-accelerate": "^2.0.0",
     "@radix-ui/react-dialog": "^1.1.13",
     "@radix-ui/react-slot": "^1.2.2",
     "@reduxjs/toolkit": "^2.8.2",
@@ -44,11 +46,12 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.21",
-    "eslint": "^9",
+    "eslint": "^9.27.0",
     "eslint-config-next": "15.3.1",
     "postcss": "^8.5.3",
-    "prisma": "^6.7.0",
+    "prisma": "^6.8.2",
     "tailwindcss": "^4.1.4",
+    "tsx": "^4.19.4",
     "tw-animate-css": "^1.2.9",
     "typescript": "^5"
   }
