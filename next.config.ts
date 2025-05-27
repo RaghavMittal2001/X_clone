@@ -1,4 +1,7 @@
 import type { NextConfig } from "next";
+// const { PrismaPlugin } = require('@prisma/nextjs-monorepo-workaround-plugin')
+import  PrismaPlugin  from '@prisma/nextjs-monorepo-workaround-plugin';
+
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -40,12 +43,7 @@ const nextConfig: NextConfig = {
   // ✅ Add this webpack configuration for Prisma
   webpack: (config, { isServer }) => {
     if (isServer) {
-      // This ensures that Prisma's engines are bundled correctly with the serverless function.
-      // This is often needed when using the `output: 'standalone'` mode.
-      config.externals = [
-        ...config.externals,
-        '@prisma/client', // Mark Prisma client as external to be bundled by Next.js later
-      ];
+      config.plugins.push(PrismaPlugin());
     }
     return config;
   },
