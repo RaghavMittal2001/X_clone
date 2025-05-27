@@ -1,10 +1,8 @@
 import type { NextConfig } from "next";
-import PrismaPlugin from '@prisma/nextjs-monorepo-workaround-plugin';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  // ⚠️ ADD THIS TOP-LEVEL `output` PROPERTY ⚠️
-  output: 'standalone', // Enables the standalone output mode
+  output: 'standalone',
 
   images: {
     remotePatterns: [
@@ -17,7 +15,6 @@ const nextConfig: NextConfig = {
 
   experimental: {
     serverActions: {},
-    // REMOVE THE OLD `outputFileTracingIncludes` BLOCK entirely
   },
 
   async headers() {
@@ -38,13 +35,7 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // ✅ Add this webpack configuration for Prisma
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-       config.plugins.push(new PrismaPlugin());
-    }
-    return config;
-  },
+  
 };
 
 export default nextConfig;
