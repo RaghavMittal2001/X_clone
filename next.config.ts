@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // ⚠️ ADD THIS TOP-LEVEL `output` PROPERTY ⚠️
+  output: 'standalone', // Enables the standalone output mode
 
   images: {
     remotePatterns: [
@@ -14,17 +16,17 @@ const nextConfig: NextConfig = {
 
   experimental: {
     serverActions: {},
+    // REMOVE THE OLD `outputFileTracingIncludes` BLOCK entirely
   },
 
-  // ✅ Add custom headers here
   async headers() {
     return [
       {
-        source: "/(.*)", // Apply to all routes
+        source: "/(.*)",
         headers: [
           {
             key: "Cross-Origin-Opener-Policy",
-            value: "same-origin-allow-popups", // Prevents postMessage blocking
+            value: "same-origin-allow-popups",
           },
           {
             key: "Cross-Origin-Embedder-Policy",
@@ -33,6 +35,19 @@ const nextConfig: NextConfig = {
         ],
       },
     ];
+  },
+
+  // ✅ Add this webpack configuration for Prisma
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // This ensures that Prisma's engines are bundled correctly with the serverless function.
+      // This is often needed when using the `output: 'standalone'` mode.
+      config.externals = [
+        ...config.externals,
+        '@prisma/client', // Mark Prisma client as external to be bundled by Next.js later
+      ];
+    }
+    return config;
   },
 };
 
