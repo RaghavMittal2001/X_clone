@@ -1,9 +1,24 @@
-// src/lib/prisma.ts
-import { PrismaClient } from "../generated/prisma";
+import { PrismaClient } from "@prisma/client";
 import { withAccelerate } from "@prisma/extension-accelerate";
 
-const prisma = new PrismaClient({
-  datasourceUrl: process.env.DATABASE_URL, // ✅ Don't use NEXT_PUBLIC
-}).$extends(withAccelerate());
+// Define the extended client type
+type ExtendedPrismaClient = ReturnType<typeof createPrismaClient>;
 
-export default prisma; // ✅ This line is important
+const createPrismaClient = () => {
+  return new PrismaClient({
+    datasourceUrl: process.env.DATABASE_URL,
+  }).$extends(withAccelerate());
+};
+
+const globalForPrisma = globalThis as unknown as {
+  prisma: ExtendedPrismaClient | undefined;
+};
+
+const prisma =
+  globalForPrisma.prisma ?? createPrismaClient();
+
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = prisma;
+}
+
+export default prisma;
