@@ -151,7 +151,7 @@ const Authpage = () => {
   return (
     <div className="z-50 fixed inset-0 p-14 bg-background-auth flex justify-center items-center">
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="bg-black text-white rounded-2xl shadow-3xl w-full max-w-max p-24">
+        <DialogContent className="bg-black text-white rounded-2xl shadow-3xl w-full max-w-max p-24"  aria-describedby="dialog-description">
           <DialogTitle className="sr-only">Sign Up</DialogTitle>
           <div className="flex flex-col gap-6 items-center justify-center">
             <div className="pr-4">

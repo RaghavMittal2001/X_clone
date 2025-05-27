@@ -1,5 +1,11 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD ."
+  "framework": "nextjs",
+  "functions": {
+    "api/**.ts": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "routes": []
 }
