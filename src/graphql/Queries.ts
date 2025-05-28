@@ -26,7 +26,7 @@ const All_Tweets = gql`
 
 const CREATE_TWEET = gql`
   mutation CreateTweet($content: String!, $userId: Int!) {
-    createTweet(content: $content, userId: $userid) {
+    CreateTweet(content: $content, userId: $userId) {
       id
       content
     }
@@ -56,4 +56,4 @@ const DELETE_LIKE = gql`
   }
 `;
 
-export { All_Tweets, CREATE_TWEET, CREATE_REPLY , CREATE_LIKE, DELETE_LIKE};
+export { All_Tweets, CREATE_TWEET, CREATE_REPLY, CREATE_LIKE, DELETE_LIKE };

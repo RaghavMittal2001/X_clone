@@ -5,24 +5,35 @@ import React from "react";
 import { useSelector } from "react-redux";
 
 const PostTweet = () => {
-    const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const logginuser = useSelector((state: ReduxState) => state.user);
   const [createTweet] = useMutation(CREATE_TWEET);
   console.log("logginuser", logginuser);
-  const handleTweet = async (formdata: FormData): Promise<void> => {
+
+  const handleTweet = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
+    e.preventDefault(); // Stop the page from reloading
     setLoading(true);
-    console.log("formdata", formdata);
-    console.log("logginuser", logginuser);
+
+    const formData = new FormData(e.currentTarget); // Get data from the form
+    const tweet = formData.get("tweet");
+
+    console.log("Tweet content:", tweet);
+    console.log("User ID:", logginuser.id);
+
+    // Simulate mutation call
     await createTweet({
       variables: {
-        content: formdata.get("tweet"),
+        content: tweet,
         userId: logginuser.id,
       },
     });
+
     setLoading(false);
-    
     console.log("Tweet created successfully");
   };
+
   return (
     <div>
       <div className=" border-t-[0.25px]  border-b-[0.25px] flex items-stretch py-4 space-x-2 border-gray-600 relative">
@@ -35,8 +46,9 @@ const PostTweet = () => {
             height={40}
           />
         </div>
-        <form className="flex flex-col w-full text-3xl" action={handleTweet}>
+        <form className="flex flex-col w-full text-3xl" onSubmit={handleTweet}>
           <input
+            id="tweet"
             name="tweet"
             type="text"
             title="tweet"
@@ -48,7 +60,6 @@ const PostTweet = () => {
             <div className="w-full max-w-[100px] ">
               <button
                 title="Tweet"
-                formAction={handleTweet}
                 disabled={loading}
                 type="submit"
                 className="bg-primary rounded-full font-bold  px-4 py-2 w-full  text-lg text-center hover:bg-primary-hover transition duration-200"

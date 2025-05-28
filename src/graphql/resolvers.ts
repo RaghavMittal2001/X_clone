@@ -1,5 +1,5 @@
 
-import prisma  from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 
 export const resolvers = {
   Query: {
@@ -48,8 +48,8 @@ export const resolvers = {
 
 
   Mutation: {
-    createUser: async (_: unknown, args: { fullName: string; email: string;   profileImage:string }) => {
-      const { fullName, email,profileImage } = args;
+    createUser: async (_: unknown, args: { fullName: string; email: string; profileImage: string }) => {
+      const { fullName, email, profileImage } = args;
       return await prisma.user.create({
         data: {
           fullName,
@@ -74,7 +74,7 @@ export const resolvers = {
         where: { id },
       });
     },
-    createTweet: async (_: unknown, args: { content: string, userId: number }) => {
+    CreateTweet: async (_: unknown, args: { content: string, userId: number }) => {
 
       // Assuming you have a session object with user information
       return await prisma.tweet.create({
@@ -111,8 +111,8 @@ export const resolvers = {
           userId,
         },
       })).count > 0;
-    // Return true if at least one like was deleted
-    // Return false if no likes were deleted
+      // Return true if at least one like was deleted
+      // Return false if no likes were deleted
     },
 
   },
